@@ -6,9 +6,9 @@ nodes.
 
 ## Table of Contents
 
-[Architecture][#architecture]
-[Preparation][#preparation]
-[Running the System][#running-the-system]
+[Architecture](#architecture)
+[Preparation](#preparation)
+[Running the System](#running-the-system)
 
 ## Architecture
 
