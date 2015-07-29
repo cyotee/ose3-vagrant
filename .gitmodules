@@ -1,0 +1,3 @@
+[submodule "projects/openshift-asnible"]
+	path = projects/openshift-ansible
+	url = https://github.com/bashburn/openshift-ansible.git
