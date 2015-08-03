@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # setup service account for docker-registry
 echo \
     '{"kind":"ServiceAccount","apiVersion":"v1","metadata":{"name":"registry"}}' \
@@ -16,6 +17,7 @@ oadm registry --service-account=registry \
 --config=/etc/openshift/master/admin.kubeconfig \
 --credentials=/etc/openshift/master/openshift-registry.kubeconfig \
 --mount-host=/mnt/docker \
+--selector='region=infra' \
 --images='registry.access.redhat.com/openshift3/ose-${component}:${version}'
 
 # prepare generic certificate for openshift endpoints which don't provide their own certs
@@ -31,7 +33,13 @@ cat cloudapps.crt cloudapps.key $CA/ca.crt > cloudapps.router.pem
 oadm router router --replicas=1 \
     --credentials='/etc/openshift/master/openshift-router.kubeconfig' \
     --images='registry.access.redhat.com/openshift3/ose-${component}:${version}' \
+    --selector='region=infra' \
+    --stats-user='admin' \
+    --stats-password='redhat' \
     --default-cert=cloudapps.router.pem
+
+# Open the port to allow the HAProxy stats to be viewed
+iptables -I OS_FIREWALL_ALLOW -p tcp -m tcp --dport 1936 -j ACCEPT
 
 # add routing config so new projects wil leverage specified subdomain
 echo "routingConfig:" >> /etc/openshift/master/master-config.yaml
@@ -54,3 +62,6 @@ oc new-project test-project
 
 # Add bashburn to the test project
 oadm policy add-role-to-user admin bashburn -n test-project
+
+# Give bashburn admin access to the cluster
+oadm policy add-cluster-role-to-user admin bashburn

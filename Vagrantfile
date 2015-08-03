@@ -64,14 +64,7 @@ Vagrant.configure(2) do |config|
     end
     master.vm.provision "ansible" do |ansible|
       ansible.limit = 'all'
-      ansible.sudo = true
-      ansible.groups = {
-        "masters" => ["ose3-master.example.com"],
-        "nodes"   => ["ose3-node1.example.com", "ose3-node2.example.com"],
-      }
-      ansible.extra_vars = {
-        openshift_deployment_type: "enterprise",
-      }
+      ansible.inventory_path = 'ansible-hosts'
       ansible.playbook = "projects/openshift-ansible/playbooks/byo/config.yml"
     end
     master.vm.provision "shell", path: "ose3-master/post_install.sh"
